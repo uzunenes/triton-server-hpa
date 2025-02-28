@@ -87,7 +87,7 @@ spec:
     spec:
       containers:
       - name: triton
-        image: nvcr.io/nvidia/tritonserver:21.08-py3
+        image: nvcr.io/nvidia/tritonserver:24.02-py3
         ports:
         - containerPort: 8000
         - containerPort: 8001
