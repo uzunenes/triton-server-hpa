@@ -48,8 +48,8 @@ kubectl version --client
 Pull the appropriate Triton Inference Server Docker image:
 
 ```sh
-# Example for CUDA 11.4
-docker pull nvcr.io/nvidia/tritonserver:21.08-py3
+# Example for CUDA 12.2
+docker pull nvcr.io/nvidia/tritonserver:24.02-py3
 ```
 
 ## Go Programming Language Installation
