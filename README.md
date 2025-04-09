@@ -377,3 +377,11 @@ if __name__ == "__main__":
     interval = float(input("Enter the interval between requests (in seconds): "))
     main(num_threads, interval)
 ```
+
+
+#### check GPU usage with nvidia-smi
+```bash
+python3 inference.py
+another bash-> watch -n 1 nvidia-smi
+```
+
