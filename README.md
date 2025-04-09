@@ -246,6 +246,7 @@ spec:
 }
 ```
 ## Triton Inference Server Load Testing Script (Multithreaded)
+``` python
 import tritonclient.http as httpclient
 import numpy as np
 import cv2
@@ -375,4 +376,4 @@ if __name__ == "__main__":
     num_threads = int(input("Enter the number of threads: "))
     interval = float(input("Enter the interval between requests (in seconds): "))
     main(num_threads, interval)
-
+```
