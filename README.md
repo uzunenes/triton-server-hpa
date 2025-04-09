@@ -1,10 +1,10 @@
 # Mastering AI Request Volume: Scalable Solutions for High and Low Demand
 
-This guide provides step-by-step instructions for setting up an environment to manage high or low volumes of AI requests using Docker, Kubernetes (MiniKube), Triton Inference Server, and Python. Follow these steps to ensure your AI models can scale efficiently based on demand.
+This guide provides a comprehensive, step-by-step walkthrough for setting up a scalable AI inference environment. Leveraging Docker, Kubernetes (via Minikube), Triton Inference Server, and Python, you'll learn how to efficiently handle both high and low volumes of AI requests. Whether you're just setting up or aiming to scale, this guide will help ensure your infrastructure adapts seamlessly to varying workloads.
 
 ---
 
-## Part 1: Setting Up the Environment
+## 1 Installation and GPU Utilization
 
 ### 1.1 NVIDIA Container Toolkit
 
@@ -82,9 +82,7 @@ helm install gpu-operator nvidia/gpu-operator \
 
 ---
 
-### CUDA Test Pod Configuration
-
-#### `cuda-test-pod.yaml`:
+#### Check Installation: `cuda-test-pod.yaml`
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -101,15 +99,16 @@ spec:
   restartPolicy: Never
 ```
 
-#### Verify CUDA:
+#### Verify GPU Operator works:
 ```bash
+kubectl apply -f cuda-test-pod.yaml
 kubectl exec -it gpu-test -- bash
 nvidia-smi
 ```
 
 ---
 
-### YOLOv7 Model Preparation
+### YOLOv7 AI Model Preparation
 
 1. Download YOLOv7-tiny model:
    ```bash
@@ -131,7 +130,9 @@ nvidia-smi
 
 4. Save the optimized model:
    ```bash
-   download yolov7-fp16-1x8x8.engine file to /mnt/tritonmodels/yolov7-tiny/1/model.plan
+   download yolov7-fp16-1x8x8.engine host
+   mkdir -p /mnt/tritonmodels/yolov7-tiny/1/
+   mv yolov7-fp16-1x8x8.engine /mnt/tritonmodels/yolov7-tiny/1/model.plan
    ```
 
 ---
@@ -378,10 +379,13 @@ if __name__ == "__main__":
     main(num_threads, interval)
 ```
 
-
 #### check GPU usage with nvidia-smi
 ```bash
 python3 inference.py
 another bash-> watch -n 1 nvidia-smi
 ```
+#### check image result
+![](resul.jpg?raw=true)
 
+
+# 2 Manage Demands with Horizontal Pod Autoscale
