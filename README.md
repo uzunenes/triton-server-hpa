@@ -1,161 +1,247 @@
 # Mastering AI Request Volume: Scalable Solutions for High and Low Demand
 
-This guide provides step-by-step instructions for setting up an environment to manage high or low volumes of AI requests using Docker, Kubernetes, Triton Inference Server, and Go. Follow these steps to ensure your AI models can scale efficiently based on demand.
+This guide provides step-by-step instructions for setting up an environment to manage high or low volumes of AI requests using Docker, Kubernetes (MiniKube), Triton Inference Server, and Python. Follow these steps to ensure your AI models can scale efficiently based on demand.
 
-## Table of Contents
-1. [Docker Installation](#docker-installation)
-2. [Kubernetes Installation (k3s)](#kubernetes-installation-k3s)
-3. [kubectl Installation](#kubectl-installation)
-4. [Pull Triton Inference Server Docker Image Based on CUDA Version](#pull-triton-inference-server-docker-image-based-on-cuda-version)
-5. [Go Programming Language Installation](#go-programming-language-installation)
-6. [Deploy Triton Docker Image with Horizontal Pod Autoscaler and Prometheus Metrics](#deploy-triton-docker-image-with-horizontal-pod-autoscaler-and-prometheus-metrics)
-7. [Host YOLOv7 Image Model on Triton](#host-yolov7-image-model-on-triton)
-8. [Send Images to YOLOv7 Model Deployment via gRPC in Go](#send-images-to-yolov7-model-deployment-via-grpc-in-go)
-9. [Observe Pod Scaling Based on Load](#observe-pod-scaling-based-on-load)
+---
 
-## Docker Installation
-To install Docker, follow these steps:
+## Part 1: Setting Up the Environment
 
-```sh
+### 1.1 NVIDIA Container Toolkit
+
+```bash
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+sed -i -e '/experimental/ s/^#//g' /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
 sudo apt-get update
-sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get install -y docker-ce
-sudo systemctl status docker
+
+sudo apt-get install -y nvidia-container-toolkit
 ```
 
-## Kubernetes Installation (k3s)
-Install k3s, a lightweight Kubernetes distribution:
-
-```sh
-curl -sfL https://get.k3s.io | sh -
-sudo k3s kubectl get node
+#### Check Installation:
+```bash
+docker run --rm --gpus all nvidia/cuda:12.2.0-devel-ubuntu22.04 nvidia-smi
 ```
 
-## kubectl Installation
-To install `kubectl`, the Kubernetes command-line tool:
+---
 
-```sh
+### 1.2 Minikube
+
+```bash
+curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+
+minikube start --driver docker --container-runtime docker --gpus all --force --mount --mount-string="/mnt/triton_models:/mnt/triton_models"
+```
+
+#### Check Installation:
+```bash
+minikube status
+```
+
+---
+
+### 1.3 Kubectl
+
+```bash
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-chmod +x kubectl
-sudo mv kubectl /usr/local/bin/
-kubectl version --client
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
 
-## Pull Triton Inference Server Docker Image Based on CUDA Version
-Pull the appropriate Triton Inference Server Docker image:
-
-```sh
-# Example for CUDA 12.2
-docker pull nvcr.io/nvidia/tritonserver:24.02-py3
+#### Check Installation:
+```bash
+kubectl get pods -A
 ```
 
-## Go Programming Language Installation
-Install Go programming language:
+---
 
-```sh
-wget https://golang.org/dl/go1.16.5.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.16.5.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-go version
+### 1.4 Helm and GPU Operator
+
+#### Install Helm:
+```bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
 ```
 
-## Deploy Triton Docker Image with Horizontal Pod Autoscaler and Prometheus Metrics
-Deploy Triton Inference Server with autoscaling and monitoring:
+#### Install GPU Operator:
+```bash
+helm repo add nvidia https://nvidia.github.io/gpu-operator
+helm repo update
 
-1. Create a deployment for Triton Inference Server.
-2. Set up Prometheus for metrics collection.
-3. Configure Horizontal Pod Autoscaler (HPA) based on Prometheus metrics.
+helm install gpu-operator nvidia/gpu-operator \
+  --namespace default \
+  --set operator.defaultRuntime=docker \
+  --set driver.enabled=true \
+  --set toolkit.enabled=true \
+  --set mig.strategy=none
+```
 
+---
+
+### CUDA Test Pod Configuration
+
+#### `cuda-test-pod.yaml`:
 ```yaml
-# triton-deployment.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-test
+spec:
+  containers:
+  - name: cuda-container
+    image: nvidia/cuda:12.2.0-devel-ubuntu22.04
+    command: ["sleep", "infinity"]
+    resources:
+      limits:
+        nvidia.com/gpu: 1
+  restartPolicy: Never
+```
+
+#### Verify CUDA:
+```bash
+kubectl exec -it gpu-test -- bash
+nvidia-smi
+```
+
+---
+
+### YOLOv7 Model Preparation
+
+1. Download YOLOv7-tiny model:
+   ```bash
+   wget https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-tiny.pt
+   ```
+2. Export YOLOv7 model to ONNX:
+   ```bash
+   python3 export.py --weights ./yolov7-tiny.pt --grid --end2end --dynamic-batch --simplify --topk-all 100 --iou-thres 0.65 --conf-thres 0.35 --img-size 640 640
+   ```
+
+3. Optimize the ONNX model with TensorRT:
+   ```bash
+   docker pull nvcr.io/nvidia/tensorrt:23.09-py3
+   docker run --rm -it --gpus all nvcr.io/nvidia/tensorrt:23.09-py3
+
+   docker cp ./yolov7-tiny.onnx containerID:/home
+   /usr/src/tensorrt/bin/trtexec --onnx=./yolov7-tiny.onnx --minShapes=images:1x3x640x640 --optShapes=images:8x3x640x640 --maxShapes=images:8x3x640x640 --fp16 --workspace=4096 --saveEngine=yolov7-fp16-1x8x8.engine --timingCacheFile=timing.cache
+   ```
+
+4. Save the optimized model:
+   ```bash
+   download yolov7-fp16-1x8x8.engine file to /mnt/tritonmodels/yolov7-tiny/1/model.plan
+   ```
+
+---
+
+## Part 2: Deploy Triton Inference Server
+
+### Deployment Configuration
+
+#### `triton-deployment.yaml`:
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: triton-deployment
+  name: triton-inference-server
+  labels:
+    app: triton-inference-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: triton
+      app: triton-inference-server
   template:
     metadata:
       labels:
-        app: triton
+        app: triton-inference-server
     spec:
       containers:
-      - name: triton
-        image: nvcr.io/nvidia/tritonserver:24.02-py3
+      - name: triton-inference-server
+        image: nvcr.io/nvidia/tritonserver:23.09-py3
+        args:
+          - "tritonserver"
+          - "--model-repository=/mnt/triton_models"
+          - "--log-verbose=1"
+          - "--strict-model-config=false"
         ports:
-        - containerPort: 8000
-        - containerPort: 8001
-        - containerPort: 8002
+          - containerPort: 8000
+          - containerPort: 8001
+          - containerPort: 8002
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        env:
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: "all"
+          - name: TRITONSERVER_PROM_METRICS
+            value: "true"  # Enable Prometheus metrics
+        volumeMounts:
+          - name: model-repository
+            mountPath: /mnt/triton_models
+      volumes:
+        - name: model-repository
+          hostPath:
+            path: /mnt/triton_models
+            type: Directory
 ```
 
-```sh
-kubectl apply -f triton-deployment.yaml
+---
+
+### Triton Service Configuration
+
+#### `triton-service.yaml`:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: triton-service
+  labels:
+    app: triton-inference-server
+spec:
+  selector:
+    app: triton-inference-server
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8000
+    targetPort: 8000
+  - name: grpc
+    protocol: TCP
+    port: 8001
+    targetPort: 8001
+  - name: metrics
+    protocol: TCP
+    port: 8002
+    targetPort: 8002
+  type: LoadBalancer
 ```
 
-Set up HPA:
+---
 
-```sh
-kubectl autoscale deployment triton-deployment --cpu-percent=50 --min=1 --max=10
-```
+### Check Model Deployment
 
-## Host YOLOv7 Image Model on Triton
-Host the YOLOv7 image model on Triton Inference Server:
+1. Use `curl` to verify your model:
+   ```bash
+   curl -X GET http://localhost:8000/v2/models/yolov7tiny
+   ```
 
-1. Convert the YOLOv7 model to the format supported by Triton.
-2. Place the model in the Triton model repository.
-3. Update the Triton configuration to include the YOLOv7 model.
-
-## Send Images to YOLOv7 Model Deployment via gRPC in Go
-Send image data to the YOLOv7 model using Go and gRPC:
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "log"
-    "google.golang.org/grpc"
-    "github.com/NVIDIA/triton-inference-server/go-client/pkg/grpcclient"
-)
-
-func main() {
-    conn, err := grpc.Dial("localhost:8001", grpc.WithInsecure())
-    if err != nil {
-        log.Fatalf("Failed to connect to Triton server: %v", err)
-    }
-    defer conn.Close()
-
-    client := grpcclient.NewGRPCInferenceServiceClient(conn)
-
-    // Load and prepare your image data here
-
-    response, err := client.ModelInfer(context.Background(), &grpcclient.ModelInferRequest{
-        // Fill in the request with model name and image data
-    })
-
-    if err != nil {
-        log.Fatalf("Failed to get inference response: %v", err)
-    }
-
-    fmt.Printf("Inference result: %v\n", response)
+#### Expected Result:
+```json
+{
+  "name":"yolov7tiny",
+  "versions":["1"],
+  "platform":"tensorrt_plan",
+  "inputs":[
+    {"name":"images","datatype":"FP32","shape":[-1,3,640,640]}
+  ],
+  "outputs":[
+    {"name":"num_dets","datatype":"INT32","shape":[-1,1]},
+    {"name":"det_boxes","datatype":"FP32","shape":[-1,100,4]},
+    {"name":"det_scores","datatype":"FP32","shape":[-1,100]},
+    {"name":"det_classes","datatype":"INT32","shape":[-1,100]}
+  ]
 }
 ```
-
-## Observe Pod Scaling Based on Load
-Monitor the pods to see them scale up or down based on the load:
-
-```sh
-kubectl get hpa
-kubectl get pods -w
-```
-
-You should see the number of pods increase or decrease based on the CPU usage and the HPA configuration.
-
-By following these steps, you will be able to manage high or low volumes of AI requests efficiently using Docker, Kubernetes, Triton Inference Server, and Go.
