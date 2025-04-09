@@ -1,12 +1,12 @@
-# Mastering AI Request Volume: Scalable Solutions for High and Low Demand
+## Mastering AI Request Volume: Scalable Solutions for High and Low Demand
 
 This guide provides a comprehensive, step-by-step walkthrough for setting up a scalable AI inference environment. Leveraging Docker, Kubernetes (via Minikube), Triton Inference Server, and Python, you'll learn how to efficiently handle both high and low volumes of AI requests. Whether you're just setting up or aiming to scale, this guide will help ensure your infrastructure adapts seamlessly to varying workloads.
 
 ---
 
-## 1 Installation and GPU Utilization
+### 1 Installation and GPU Utilization
 
-### 1.1 NVIDIA Container Toolkit
+#### 1.1 NVIDIA Container Toolkit
 
 ```bash
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
