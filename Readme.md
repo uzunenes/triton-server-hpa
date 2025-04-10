@@ -444,10 +444,10 @@ kubectl get hpa triton-hpa
 ## Acknowledgements 
 I would like to thank my teammates for their valuable support during this work.
 
+- **Ahmet Selim Demirel**
+- **Doğan Mehmet Başoğlu**
 - **Elif Cansu Ada**
 - **Mevlüt Ardıç**
-- **Doğan Mehmet Başoğlu**
-- **Ahmet Selim Demirel**
 - **Serhat Karaca**
 
 ## References
