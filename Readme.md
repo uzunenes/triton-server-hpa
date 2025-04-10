@@ -226,7 +226,7 @@ spec:
   type: LoadBalancer
 ```
 
-# Port-forward Triton service to local port 8000
+### Port-forward Triton service to local port 8000
 ```bash
 kubectl port-forward svc/triton-service 8000:8000 &
 ```
