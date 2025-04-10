@@ -249,6 +249,11 @@ spec:
   type: LoadBalancer
 ```
 
+# Port forward Triton service to local port 8000
+```bash
+kubectl port-forward svc/triton-service 8000:8000 &
+```
+
 ---
 
 ### Verify Model Deployment
@@ -293,7 +298,7 @@ watch -n 1 nvidia-smi # run another session
 
 ## 4. Manage Demands with Horizontal Pod Autoscale
 
-### 4.1 Install DCGM and GPU Monitoring
+### 4.1 Install DCGM on Host
 
 ```bash
 # Download the NVIDIA CUDA keyring package
@@ -310,6 +315,7 @@ sudo apt-get update && sudo apt-get install -y datacenter-gpu-manager
 
 # Start and enable NVIDIA DCGM service
 sudo systemctl --now enable nvidia-dcgm
+sudo systemctl status nvidia-dcgm
 
 # Discover GPUs with DCGM
 dcgmi discovery -l
@@ -319,23 +325,19 @@ dcgmi discovery -l
 
 ```bash
 # Add GPU-Helm-Charts repository
-helm repo add gpu-helm-charts \
-  https://nvidia.github.io/dcgm-exporter/helm-charts
+helm repo add gpu-helm-charts https://nvidia.github.io/dcgm-exporter/helm-charts
 
 # Update the repository
 helm repo update
 
 # Install DCGM Exporter
-helm install \
-    --generate-name \
-    gpu-helm-charts/dcgm-exporter
+helm install --generate-name gpu-helm-charts/dcgm-exporter
 
 # Apply DCGM Exporter YAML file to Kubernetes
 kubectl create -f https://raw.githubusercontent.com/NVIDIA/dcgm-exporter/master/dcgm-exporter.yaml
 
 # Get the name of the first DCGM Exporter pod
-NAME=$(kubectl get pods -l "app.kubernetes.io/name=dcgm-exporter" \
-                         -o "jsonpath={ .items[0].metadata.name}")
+NAME=$(kubectl get pods -l "app.kubernetes.io/name=dcgm-exporter" -o "jsonpath={ .items[0].metadata.name}")
 
 # Port forward the pod's 9400 port to local 8080
 kubectl port-forward $NAME 8080:9400 &
@@ -366,9 +368,6 @@ helm inspect values prometheus-community/kube-prometheus-stack > /tmp/kube-prome
 
 > **Note:** I shared the complete file. Please check the differences carefully.
 
-
-
-
 # Install Prometheus stack with custom values
 helm install prometheus-community/kube-prometheus-stack \
    --create-namespace --namespace prometheus \
@@ -382,28 +381,16 @@ helm install prometheus-adapter prometheus-community/prometheus-adapter \
    --set prometheus.url=http://kube-prometheus-stack-1744-prometheus.prometheus.svc \
    --set prometheus.port=9090
 
+```bash
+# Port forward Prometheus service to local port 9090
+kubectl port-forward svc/kube-prometheus-stack-1744-prometheus -n prometheus 9090:9090 &
+```
+
 # Check for the DCGM_FI_DEV_MEM_COPY_UTIL metric
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq -r . | grep DCGM_FI_DEV_MEM_COPY_UTIL
 ```
 
 ---
-
-### 4.4 Verify Horizontal Pod Autoscaler
-
-Forward services to local ports for monitoring:
-```bash
-# Port forward Triton service to local port 8000
-kubectl port-forward svc/triton-service 8000:8000 &
-
-# Port forward Prometheus service to local port 9090
-kubectl port-forward svc/kube-prometheus-stack-1744-prometheus -n prometheus 9090:9090 &
-
-# Port forward DCGM Exporter service to local port 9400
-kubectl port-forward svc/dcgm-exporter -n default 9400:9400 &
-```
-
-
-
 
 ### 4.4 Configure Horizontal Pod Autoscaler (HPA)
 
@@ -441,7 +428,7 @@ Apply the HPA configuration:
 kubectl apply -f hpa_gpu.yaml
 ```
 
-Check the HPA status:
+Check the HPA status adn metrics:
 ```bash
 kubectl get hpa triton-hpa
 ```
