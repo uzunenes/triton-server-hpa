@@ -363,6 +363,7 @@ helm install prometheus-adapter prometheus-community/prometheus-adapter \
 kubectl port-forward svc/kube-prometheus-stack-1744-prometheus -n prometheus 9090:9090 &
 ```
 
+```
 # Check for the DCGM_FI_DEV_MEM_COPY_UTIL metric
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq -r . | grep DCGM_FI_DEV_MEM_COPY_UTIL
 ```
