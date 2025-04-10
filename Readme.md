@@ -3,40 +3,67 @@
 In this guide, you'll learn how to build a scalable AI inference system that dynamically handles fluctuating workloads. Using tools like Docker, Kubernetes, and Triton Inference Server, this step-by-step tutorial covers everything from installation to horizontal scaling.
 
 ---
+# Table of Contents
 
-## 1. Installation and GPU Utilization
+- [Mastering AI Request Volumes: Scalable Solutions for High and Low Demands](#mastering-ai-request-volumes-scalable-solutions-for-high-and-low-demands)
+  - [1. Create simple Vision based AI Model Application](#1-create-simple-vision-based-ai-model-application)
+    - [1.1 Installation](#11-installation)
+      - [1.1.1 NVIDIA Container Toolkit](#111-nvidia-container-toolkit)
+      - [1.1.2 K8s - Minikube](#112-k8s---minikube)
+      - [1.1.3 Kubectl](#113-kubectl)
+      - [1.1.4 Helm and GPU Operator](#114-helm-and-gpu-operator)
+    - [1.2 Preparing the YOLOv7 AI Model](#12-preparing-the-yolov7-ai-model)
+    - [1.3 Deploying Triton Inference Server](#13-deploying-triton-inference-server)
+      - [Deployment Configuration](#deployment-configuration)
+      - [Triton Service Configuration](#triton-service-configuration)
+      - [Verify Model Deployment](#verify-model-deployment)
+    - [1.4 Create High GPU Usage and Check Results](#14-create-high-gpu-usage-and-check-results)
+  - [2. Manage Demands with Horizontal Pod Autoscale](#2-manage-demands-with-horizontal-pod-autoscale)
+    - [2.1 Install DCGM on Host](#21-install-dcgm-on-host)
+    - [2.2 Deploy DCGM Exporter](#22-deploy-dcgm-exporter)
+---
 
-### 1.1 NVIDIA Container Toolkit
+## 1. Create simple Vision based AI Model Application
+
+### 1.1 Installation
+
+#### 1.1.1 NVIDIA Container Toolkit
 
 Install the NVIDIA Container Toolkit to enable GPU support for Docker containers.
 
 ```bash
-curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+# Add NVIDIA's GPG key to the system's keyring
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
+# Add the NVIDIA Container Toolkit repository
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+# Enable experimental features and install the toolkit
 sed -i -e '/experimental/ s/^#//g' /etc/apt/sources.list.d/nvidia-container-toolkit.list
-
-sudo apt-get update
-sudo apt-get install -y nvidia-container-toolkit
+sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
 ```
 
 #### Verify Installation:
 ```bash
 docker run --rm --gpus all nvidia/cuda:12.2.0-devel-ubuntu22.04 nvidia-smi
 ```
+Expected Output: The nvidia-smi command should display GPU details.
+
+
 
 ---
-
-### 1.2 Minikube
+### 1.1.2 K8s - Minikube
 
 Install and configure Minikube with GPU support.
 
 ```bash
+# Download and install Minikube
 curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 
+# Start Minikube with GPU and volume mounting enabled
 minikube start --driver docker --container-runtime docker --gpus all --force --mount --mount-string="/mnt/triton_models:/mnt/triton_models"
 ```
 
@@ -47,11 +74,12 @@ minikube status
 
 ---
 
-### 1.3 Kubectl
+### 1.1.3 Kubectl
 
 Install `kubectl`, the Kubernetes command-line tool.
 
 ```bash
+# Download and install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
@@ -63,7 +91,7 @@ kubectl get pods -A
 
 ---
 
-### 1.4 Helm and GPU Operator
+### 1.1.4 Helm and GPU Operator
 
 #### Install Helm:
 ```bash
@@ -74,9 +102,11 @@ chmod 700 get_helm.sh
 
 #### Install GPU Operator:
 ```bash
+# Add NVIDIA Helm repository
 helm repo add nvidia https://nvidia.github.io/gpu-operator
 helm repo update
 
+# Install GPU Operator
 helm install gpu-operator nvidia/gpu-operator \
   --namespace default \
   --set operator.defaultRuntime=docker \
@@ -114,7 +144,7 @@ nvidia-smi
 
 ---
 
-## 2. Preparing the YOLOv7 AI Model
+## 1.2 Preparing the YOLOv7 AI Model
 
 1. **Download the YOLOv7-tiny model:**
    ```bash
@@ -144,7 +174,7 @@ nvidia-smi
 
 ---
 
-## 3. Deploying Triton Inference Server
+## 1.3 Deploying Triton Inference Server
 
 ### Deployment Configuration
 
@@ -259,7 +289,7 @@ curl -X GET http://localhost:8000/v2/models/yolov7tiny
 
 ---
 
-### Create High GPU Usage and Check Results
+### 1.4 Create High GPU Usage and Check Results
 
 #### Create GPU Usage:
 ```bash
@@ -273,9 +303,9 @@ watch -n 1 nvidia-smi # run another session
 
 ---
 
-## 4. Manage Demands with Horizontal Pod Autoscale
+## 2. Manage Demands with Horizontal Pod Autoscale
 
-### 4.1 Install DCGM on Host
+### 2.1 Install DCGM on Host
 
 ```bash
 # Download the NVIDIA CUDA keyring package
@@ -298,7 +328,7 @@ sudo systemctl status nvidia-dcgm
 dcgmi discovery -l
 ```
 
-### 4.2 Deploy DCGM Exporter
+### 2.2 Deploy DCGM Exporter
 
 ```bash
 # Add GPU-Helm-Charts repository
@@ -328,7 +358,7 @@ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/servic
 
 ---
 
-### 4.3 Set Up Prometheus and Prometheus Adapter
+### 2.3 Set Up Prometheus and Prometheus Adapter
 
 ```bash
 # Add Prometheus community Helm repository
@@ -370,7 +400,7 @@ kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq -r . | grep DCGM_FI_D
 
 ---
 
-### 4.4 Configure Horizontal Pod Autoscaler (HPA)
+### 2.4 Configure Horizontal Pod Autoscaler (HPA)
 
 Create an HPA YAML file to dynamically scale Triton Inference Server pods based on GPU utilization.
 
