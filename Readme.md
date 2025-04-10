@@ -1,7 +1,6 @@
-
 # Mastering AI Request Volumes: Scalable Solutions for High and Low Demands
 
-This guide provides a detailed, step-by-step process for setting up a scalable AI inference environment. By leveraging Docker, Kubernetes (via Minikube), Triton Inference Server, and Python, this guide equips you with the tools to efficiently handle both high and low volumes of AI requests. Whether you're starting fresh or scaling up, this guide ensures your infrastructure adapts effortlessly to fluctuating workloads.
+In this guide, you'll learn how to build a scalable AI inference system that dynamically handles fluctuating workloads. Using tools like Docker, Kubernetes, and Triton Inference Server, this step-by-step tutorial covers everything from installation to horizontal scaling.
 
 ---
 
@@ -270,6 +269,7 @@ watch -n 1 nvidia-smi # run another session
 
 #### Check Inference Result:
 ![](detection_result_nms.jpg?raw=true)
+*Figure: Example output of the detection model after inference.*
 
 ---
 
@@ -421,5 +421,5 @@ I would like to thank my teammates for their valuable support during this work.
 - **Serhat Karaca**
 
 ## References
-
-[1] https://docs.nvidia.com/ai-enterprise/deployment/natural-language-processing/latest/scaling.html
+- [NVIDIA NLP Scaling Documentation](https://docs.nvidia.com/ai-enterprise/deployment/natural-language-processing/latest/scaling.html)
+- [Kubernetes Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
