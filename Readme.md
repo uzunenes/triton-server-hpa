@@ -1,7 +1,7 @@
 
-# Mastering AI Request Volume: Scalable Solutions for High and Low Demand
+# Mastering AI Request Volume: Scalable Solutions for High and Low Demands
 
-This guide provides a detailed, step-by-step process for setting up a scalable AI inference environment. By leveraging Docker, Kubernetes (via Minikube), Triton Inference Server, and Python, this guide equips you to efficiently handle both high and low volumes of AI requests. Whether you're starting fresh or scaling up, this guide ensures your infrastructure adapts effortlessly to fluctuating workloads.
+This guide provides a detailed, step-by-step process for setting up a scalable AI inference environment. By leveraging Docker, Kubernetes (via Minikube), Triton Inference Server, and Python, this guide equips you with the tools to efficiently handle both high and low volumes of AI requests. Whether you're starting fresh or scaling up, this guide ensures your infrastructure adapts effortlessly to fluctuating workloads.
 
 ---
 
@@ -132,11 +132,12 @@ nvidia-smi
    docker pull nvcr.io/nvidia/tensorrt:23.09-py3
    docker run --rm -it --gpus all nvcr.io/nvidia/tensorrt:23.09-py3
 
-   docker cp ./yolov7-tiny.onnx containerID:/home
+   # Replace <container_id> with actual container ID
+   docker cp ./yolov7-tiny.onnx <container_id>:/home
    /usr/src/tensorrt/bin/trtexec --onnx=./yolov7-tiny.onnx --minShapes=images:1x3x640x640 --optShapes=images:8x3x640x640 --maxShapes=images:8x3x640x640 --fp16 --workspace=4096 --saveEngine=yolov7-fp16-1x8x8.engine --timingCacheFile=timing.cache
    ```
 
-4. **Save the optimized model:**
+4. **Move the optimized model to the Triton model repository:**
    ```bash
    mkdir -p /mnt/tritonmodels/yolov7-tiny/1/
    mv yolov7-fp16-1x8x8.engine /mnt/tritonmodels/yolov7-tiny/1/model.plan
@@ -152,30 +153,6 @@ Create a deployment for Triton Inference Server.
 
 `triton-deployment.yaml`
 ```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: triton-service
-  labels:
-    app: triton-inference-server
-spec:
-  selector:
-    app: triton-inference-server
-  ports:
-  - name: http
-    protocol: TCP
-    port: 8000
-    targetPort: 8000
-  - name: grpc
-    protocol: TCP
-    port: 8001
-    targetPort: 8001
-  - name: metrics
-    protocol: TCP
-    port: 8002
-    targetPort: 8002
-  type: LoadBalancer
-root@ubuntu:~# cat triton_dep.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -249,7 +226,7 @@ spec:
   type: LoadBalancer
 ```
 
-# Port forward Triton service to local port 8000
+# Port-forward Triton service to local port 8000
 ```bash
 kubectl port-forward svc/triton-service 8000:8000 &
 ```
@@ -285,7 +262,7 @@ curl -X GET http://localhost:8000/v2/models/yolov7tiny
 
 ### Create High GPU Usage and Check Results
 
-#### Cretae GPU Usage:
+#### Create GPU Usage:
 ```bash
 python3 inference.py # example: thread 99, sleep 0.001
 watch -n 1 nvidia-smi # run another session
