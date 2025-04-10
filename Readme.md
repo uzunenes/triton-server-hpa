@@ -1,5 +1,5 @@
 
-# Mastering AI Request Volume: Scalable Solutions for High and Low Demands
+# Mastering AI Request Volumes: Scalable Solutions for High and Low Demands
 
 This guide provides a detailed, step-by-step process for setting up a scalable AI inference environment. By leveraging Docker, Kubernetes (via Minikube), Triton Inference Server, and Python, this guide equips you with the tools to efficiently handle both high and low volumes of AI requests. Whether you're starting fresh or scaling up, this guide ensures your infrastructure adapts effortlessly to fluctuating workloads.
 
