@@ -438,3 +438,16 @@ Check the HPA status:
 ```bash
 kubectl get hpa triton-hpa
 ```
+
+## Acknowledgements 
+I would like to thank the following individuals for their valuable support and contributions to this work:
+
+- **Elif Cansu Ada**
+- **Mevlüt Ardıç**
+- **Doğan Mehmet Başoğlu**
+- **Ahmet Selim Demirel**
+- **Serhat Karaca**
+
+## References
+
+[1] https://docs.nvidia.com/ai-enterprise/deployment/natural-language-processing/latest/scaling.html
