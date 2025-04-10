@@ -139,8 +139,8 @@ nvidia-smi
 
 4. **Move the optimized model to the Triton model repository:**
    ```bash
-   mkdir -p /mnt/tritonmodels/yolov7-tiny/1/
-   mv yolov7-fp16-1x8x8.engine /mnt/tritonmodels/yolov7-tiny/1/model.plan
+   mkdir -p /mnt/triton_models/yolov7tiny/1/
+   mv yolov7-fp16-1x8x8.engine /mnt/triton_models/yolov7tiny/1/model.plan
    ```
 
 ---
