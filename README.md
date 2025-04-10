@@ -362,6 +362,13 @@ helm search repo kube-prometheus
 # Export default values for kube-prometheus-stack
 helm inspect values prometheus-community/kube-prometheus-stack > /tmp/kube-prometheus-stack.values
 
+# Edit `kube-prometheus-stack.values` file
+
+> **Note:** I shared the complete file. Please check the differences carefully.
+
+
+
+
 # Install Prometheus stack with custom values
 helm install prometheus-community/kube-prometheus-stack \
    --create-namespace --namespace prometheus \
@@ -440,7 +447,7 @@ kubectl get hpa triton-hpa
 ```
 
 ## Acknowledgements 
-I would like to thank the following individuals for their valuable support and contributions to this work:
+I would like to thank my teammates for their valuable support during this work.
 
 - **Elif Cansu Ada**
 - **Mevlüt Ardıç**
