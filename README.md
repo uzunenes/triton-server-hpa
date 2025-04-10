@@ -278,16 +278,16 @@ curl -X GET http://localhost:8000/v2/models/yolov7tiny
 
 ---
 
-### Check GPU Usage and Results
+### Create High GPU Usage and Check Results
 
-#### Check GPU Usage:
+#### Cretae GPU Usage:
 ```bash
-python3 inference.py
-another bash-> watch -n 1 nvidia-smi
+python3 inference.py # example: thread 99, sleep 0.001
+watch -n 1 nvidia-smi # run another session
 ```
 
-#### Check Image Result:
-![](resul.jpg?raw=true)
+#### Check Inference Result:
+![](detection_result_nms.jpg?raw=true)
 
 ---
 
