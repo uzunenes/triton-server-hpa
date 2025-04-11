@@ -5,7 +5,7 @@ import threading
 import time
 
 # Model configuration
-url = "localhost:8000"  # No scheme like "http://"
+url = "192.168.49.2:30001"  # No scheme like "http://"
 model_name = "yolov7tiny"
 model_version = "1"
 
@@ -20,9 +20,6 @@ image = cv2.resize(image, (640, 640))  # Resize to model input size
 image = image.astype(np.float32) / 255.0  # Normalize to [0, 1]
 image = np.transpose(image, (2, 0, 1))  # Convert from (H, W, C) to (C, H, W)
 image = np.expand_dims(image, axis=0)  # Add batch dimension [1, C, H, W]
-
-# Connect to Triton Inference Server
-client = httpclient.InferenceServerClient(url=url)
 
 # Set up input tensor
 inputs = [
@@ -74,9 +71,18 @@ def process_detections(response, thread_boxes, thread_scores):
 def infer_thread(thread_id, interval, thread_boxes, thread_scores):
     print(f"Thread {thread_id} started.")
     while True:
+        # Reinitialize the Triton client to "close" and reopen the connection
+        client = httpclient.InferenceServerClient(url=url)
+
+        # Perform inference
         response = client.infer(model_name=model_name, inputs=inputs, outputs=outputs, model_version=model_version)
+
+        # Process the results
         process_detections(response, thread_boxes, thread_scores)
         print(f"Thread {thread_id} completed an inference.")
+
+        # Close the client (simulate closing the connection)
+        del client
         time.sleep(interval)
 
 def main(num_threads, interval):
