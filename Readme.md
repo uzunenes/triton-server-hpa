@@ -21,6 +21,10 @@ In this guide, you'll learn how to build a scalable AI inference system that dyn
   - [2. Manage Demands with Horizontal Pod Autoscale](#2-manage-demands-with-horizontal-pod-autoscale)
     - [2.1 Install DCGM on Host](#21-install-dcgm-on-host)
     - [2.2 Deploy DCGM Exporter](#22-deploy-dcgm-exporter)
+    - [2.3 Set Up Prometheus and Prometheus Adapter](#23-set-up-prometheus-and-prometheus-adapter)
+    - [2.4 Configure Horizontal Pod Autoscaler (HPA)](#24-configure-horizontal-pod-autoscaler-hpa)
+
+    
 ---
 
 ## 1. Create simple Vision based AI Model Application
