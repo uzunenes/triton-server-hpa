@@ -110,9 +110,8 @@ helm repo update
 helm install gpu-operator nvidia/gpu-operator \
   --namespace default \
   --set operator.defaultRuntime=docker \
-  --set driver.enabled=true \
   --set toolkit.enabled=true \
-  --set mig.strategy=none
+  --set devicePlugin.config.name=time-slicing-config
 ```
 
 #### Verify Setup with a Test Pod:
@@ -141,6 +140,33 @@ kubectl apply -f cuda-test-pod.yaml
 kubectl exec -it gpu-test -- bash
 nvidia-smi
 ```
+
+#### Time Slicing:
+`time-slicing-config.yaml`
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: time-slicing-config
+  namespace: default
+data:
+  default: |-
+    version: v1
+    sharing:
+      timeSlicing:
+        resources:
+        - name: nvidia.com/gpu
+          replicas: 10
+```
+
+```bash
+kubectl patch clusterpolicy cluster-policy \
+  --type merge \
+  -p '{"spec": {"devicePlugin": {"config": {"name": "time-slicing-config", "default": "default"}}}}'
+```
+
+
+restart nvidia-device-plugin pod and test multiple deploymnet 
 
 ---
 
