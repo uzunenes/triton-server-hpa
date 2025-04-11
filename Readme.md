@@ -231,11 +231,11 @@ spec:
           - "tritonserver"
           - "--model-repository=/mnt/triton_models"
           - "--log-verbose=1"
-          - "--strict-model-config=false"
         ports:
           - containerPort: 8000
           - containerPort: 8001
           - containerPort: 8002
+        terminationMessagePolicy: FallbackToLogsOnError
         resources:
           limits:
             nvidia.com/gpu: 1
@@ -256,7 +256,6 @@ spec:
 
 `triton-service.yaml`
 ```yaml
-apiVersion: v1
 kind: Service
 metadata:
   name: triton-service
@@ -270,15 +269,18 @@ spec:
     protocol: TCP
     port: 8000
     targetPort: 8000
+    nodePort: 30001  # Dışarıya açık olacak port
   - name: grpc
     protocol: TCP
     port: 8001
     targetPort: 8001
+    nodePort: 30002
   - name: metrics
     protocol: TCP
     port: 8002
     targetPort: 8002
-  type: LoadBalancer
+    nodePort: 30003
+  type: NodePort
 ```
 
 ### Port-forward Triton service to local port 8000
@@ -451,10 +453,10 @@ spec:
         name: DCGM_FI_DEV_GPU_UTIL
       describedObject:
         kind: Service
-        name: dcgm-exporter-1744216530 # Service name
+        name: dcgm-exporter-1744216530 # Servis adı
       target:
         type: Value
-        value: '2' # Target GPU utilization
+        value: '2'
 ```
 
 Apply the HPA configuration:
@@ -466,6 +468,12 @@ Check the HPA status adn metrics:
 ```bash
 kubectl get hpa triton-hpa
 ```
+
+#### Check Inference Result:
+![](result.png?raw=true)
+*Figure: Example output of the HPA.*
+
+---
 
 ## Acknowledgements 
 I would like to thank my teammates for their valuable support during this work.
