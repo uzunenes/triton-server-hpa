@@ -23,7 +23,8 @@ In this guide, you'll learn how to build a scalable AI inference system that dyn
     - [2.2 Deploy DCGM Exporter](#22-deploy-dcgm-exporter)
     - [2.3 Set Up Prometheus and Prometheus Adapter](#23-set-up-prometheus-and-prometheus-adapter)
     - [2.4 Configure Horizontal Pod Autoscaler (HPA)](#24-configure-horizontal-pod-autoscaler-hpa)
-
+- [Acknowledgements](#acknowledgements)
+- [References](#references)
     
 ---
 
@@ -164,13 +165,14 @@ data:
 ```
 
 ```bash
+kubectl apply -f time-slicing-config.yaml
 kubectl patch clusterpolicy cluster-policy \
   --type merge \
   -p '{"spec": {"devicePlugin": {"config": {"name": "time-slicing-config", "default": "default"}}}}'
 ```
 
 
-restart nvidia-device-plugin pod and test multiple deploymnet 
+> **Note:** Restart 'nvidia-device-plugin' pod and test multiple GPU deployment 
 
 ---
 
@@ -183,6 +185,7 @@ restart nvidia-device-plugin pod and test multiple deploymnet
 
 2. **Export the YOLOv7 model to ONNX format:**
    ```bash
+   # download export.py -> https://github.com/WongKinYiu/yolov7
    python3 export.py --weights ./yolov7-tiny.pt --grid --end2end --dynamic-batch --simplify --topk-all 100 --iou-thres 0.65 --conf-thres 0.35 --img-size 640 640
    ```
 
@@ -239,7 +242,6 @@ spec:
           - containerPort: 8000
           - containerPort: 8001
           - containerPort: 8002
-        terminationMessagePolicy: FallbackToLogsOnError
         resources:
           limits:
             nvidia.com/gpu: 1
@@ -473,7 +475,7 @@ Check the HPA status adn metrics:
 kubectl get hpa triton-hpa
 ```
 
-#### Check Inference Result:
+#### Check HPA Result:
 ![](result.png?raw=true)
 *Figure: Example output of the HPA.*
 
@@ -491,3 +493,4 @@ I would like to thank my teammates for their valuable support during this work.
 ## References
 - [NVIDIA NLP Scaling Documentation](https://docs.nvidia.com/ai-enterprise/deployment/natural-language-processing/latest/scaling.html)
 - [Kubernetes Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+- [Vision Model - Yolov7](https://github.com/WongKinYiu/yolov7)
