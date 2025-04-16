@@ -3,7 +3,7 @@
 In this guide, you'll learn how to build a scalable AI inference system that dynamically handles fluctuating workloads. Using tools like Docker, Kubernetes, and Triton Inference Server, this step-by-step tutorial covers everything from installation to horizontal scaling.
 
 ---
-![](images/triton-server-hps_architecture.png?raw=true)
+![](docs/images/triton-server-hps_architecture.jpg?raw=true)
 *Figure: Example output of the detection model after inference.*
 ---
 # Table of Contents
@@ -335,7 +335,7 @@ watch -n 1 nvidia-smi # run another session
 ```
 
 #### Check Inference Result:
-![](images/detection_result_nms.jpg?raw=true)
+![](docs/images/detection_result_nms.jpg?raw=true)
 *Figure: Example output of the detection model after inference.*
 
 ---
@@ -479,7 +479,7 @@ kubectl get hpa triton-hpa
 ```
 
 #### Check HPA Result:
-![](images/result.png?raw=true)
+![](docs/images/result.jpg?raw=true)
 *Figure: Example output of the HPA.*
 
 ---

@@ -10,7 +10,7 @@ model_name = "yolov7tiny"
 model_version = "1"
 
 # Load the input image and store original dimensions
-image_path = 'input_image.jpg'
+image_path = 'docs/images/input_image.jpg'
 image = cv2.imread(image_path)
 original_image = image.copy()  # Keep a copy to draw detections later
 orig_height, orig_width = original_image.shape[:2]
