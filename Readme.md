@@ -1,12 +1,13 @@
 # Mastering AI Request Volumes: Scalable Solutions for High and Low Demands
 
-In this guide, you'll learn how to build a scalable AI inference system that dynamically handles fluctuating workloads. Using tools like Docker, Kubernetes, and Triton Inference Server, this step-by-step tutorial covers everything from installation to horizontal scaling.
+In this guide, you'll learn how to build a scalable AI inference system that dynamically handles fluctuating workloads.
+Using tools like Docker, Kubernetes, and Nvidia Triton Inference Server, this step-by-step tutorial covers everything from installation to horizontal scaling.
 
 
 ![](docs/images/triton-server-hpa_architecture.jpg?raw=true)
 
 
-# Table of Contents
+## Table of Contents
 
 - [Mastering AI Request Volumes: Scalable Solutions for High and Low Demands](#mastering-ai-request-volumes-scalable-solutions-for-high-and-low-demands)
   - [1. Create simple Vision based AI Model Application](#1-create-simple-vision-based-ai-model-application)
