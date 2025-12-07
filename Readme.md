@@ -1,4 +1,5 @@
-# Mastering AI Request Volumes: Scalable Solutions for High and Low Demands
+# ⚡ Triton Server HPA
+> GPU-based Horizontal Pod Autoscaling for NVIDIA Triton Inference Server
 
 In this guide, you'll learn how to build a scalable AI inference system that dynamically handles fluctuating workloads.
 Using tools like Docker, Kubernetes, and Nvidia Triton Inference Server, this step-by-step tutorial covers everything from installation to horizontal scaling.
