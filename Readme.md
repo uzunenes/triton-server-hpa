@@ -266,6 +266,7 @@ spec:
 
 `triton-service.yaml`
 ```yaml
+apiVersion: v1
 kind: Service
 metadata:
   name: triton-service
@@ -279,7 +280,7 @@ spec:
     protocol: TCP
     port: 8000
     targetPort: 8000
-    nodePort: 30001  # Dışarıya açık olacak port
+    nodePort: 30001
   - name: grpc
     protocol: TCP
     port: 8001
@@ -463,7 +464,7 @@ spec:
         name: DCGM_FI_DEV_GPU_UTIL
       describedObject:
         kind: Service
-        name: dcgm-exporter-1744216530 # Servis adı
+        name: dcgm-exporter-1744216530
       target:
         type: Value
         value: '2'
