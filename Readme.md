@@ -1,4 +1,4 @@
-# ⚡ Triton Server HPA
+# Triton Server HPA
 > GPU-based Horizontal Pod Autoscaling for NVIDIA Triton Inference Server
 
 In this guide, you'll learn how to build a scalable AI inference system that dynamically handles fluctuating workloads.
