@@ -12,7 +12,7 @@ HorizontalPodAutoscaler adds replicas when **GPU utilisation** rises — not CPU
 not memory. One physical GPU is time-sliced so several Triton pods share it,
 which makes the whole thing demonstrable on a single-GPU machine.
 
-![](docs/images/triton-server-hpa_architecture.jpg?raw=true)
+![Clients hit a Kubernetes service in front of a Triton deployment; DCGM exporter feeds GPU utilisation to Prometheus, the Prometheus adapter and the custom metrics API, which the HPA reads to scale the deployment.](docs/images/triton-server-hpa_architecture.svg?raw=true)
 
 ## What it looks like when it works
 
@@ -375,7 +375,7 @@ python3 inference.py --mode detect --url "$(minikube ip):30001"
 wrote detection_result.jpg
 ```
 
-![](docs/images/detection_result.jpg?raw=true)
+![YOLOv7-tiny detections returned by Triton: a person at 0.91 and a dog at 0.82.](docs/images/detection_result.jpg?raw=true)
 
 ---
 
@@ -508,7 +508,7 @@ Observed run: GPU utilisation crossed 30 % within 10 s, the deployment reached
 five replicas after ~60 s, sustained **~359 req/s**, and returned to a single
 replica about six minutes after the load stopped.
 
-![](docs/images/result.jpg?raw=true)
+![kubectl and nvidia-smi during the load test: five Triton pods Running, GPU 47% busy with five tritonserver processes on GPU 0, HPA showing 47/30 and 5 replicas.](docs/images/result.jpg?raw=true)
 
 ---
 
