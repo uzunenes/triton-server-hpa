@@ -1,0 +1,23 @@
+# Overrides for prometheus-community/kube-prometheus-stack.
+#
+# This replaces the 5326-line full values dump that used to live in this repo.
+# Only ONE setting actually mattered there, and it is the one below.
+#
+# By default the chart makes Prometheus select only the ServiceMonitors it
+# created itself. dcgm-exporter installs its own ServiceMonitor, so Prometheus
+# would ignore it and DCGM_FI_DEV_GPU_UTIL would never reach the custom metrics
+# API. Setting this to false makes Prometheus select every ServiceMonitor in
+# the cluster.
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    # Keep the demo light; the HPA only needs recent samples.
+    retention: 2h
+    scrapeInterval: 5s
+
+# Not needed for the HPA demo - trim them to save memory on a laptop/VM.
+grafana:
+  enabled: false
+alertmanager:
+  enabled: false

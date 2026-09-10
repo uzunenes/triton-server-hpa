@@ -1,0 +1,21 @@
+# Dependencies for exporting yolov7-tiny.pt to ONNX (scripts step 1.2).
+#
+# torch is pinned below 2.6 on purpose: PyTorch 2.6 flipped the default of
+# torch.load() to weights_only=True, which makes YOLOv7's export.py fail with
+#   _pickle.UnpicklingError: Weights only load failed
+# and torch >= 2.9 routes torch.onnx.export through the dynamo exporter, which
+# needs onnxscript and does not produce the end2end graph YOLOv7 expects.
+torch==2.5.1
+torchvision==0.20.1
+onnx==1.17.0
+onnxruntime
+onnxsim
+# yolov7's export.py imports these transitively
+seaborn
+pandas
+pyyaml
+requests
+scipy
+tqdm
+matplotlib
+opencv-python-headless

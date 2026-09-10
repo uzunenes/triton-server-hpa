@@ -1,0 +1,21 @@
+# Standalone NVIDIA device plugin with GPU time-slicing.
+#
+# Why not the GPU Operator? minikube only accepts `--gpus all` together with
+# `--container-runtime docker` (cri-dockerd), and cri-dockerd does not implement
+# RuntimeClass handlers. Every current GPU Operator operand sets
+# `runtimeClassName: nvidia`, so they all fail with
+# `RuntimeHandler "nvidia" not supported`. The standalone plugin sets no
+# runtimeClassName and works fine.
+#
+# replicas: 10 advertises nvidia.com/gpu: 10 for one physical GPU, letting up
+# to 10 Triton pods time-share it. That is what makes horizontal scaling
+# visible on a single-GPU machine.
+config:
+  map:
+    default: |-
+      version: v1
+      sharing:
+        timeSlicing:
+          resources:
+            - name: nvidia.com/gpu
+              replicas: 10

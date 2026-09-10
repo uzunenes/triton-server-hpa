@@ -1,0 +1,4 @@
+# Client-side dependencies for inference.py
+tritonclient[http]>=2.41
+numpy>=1.24
+opencv-python-headless>=4.8
