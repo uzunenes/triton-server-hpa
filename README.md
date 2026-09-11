@@ -507,7 +507,7 @@ Observed run: GPU utilisation crossed 30 % within 10 s, the deployment reached
 five replicas after ~60 s, sustained **~359 req/s**, and returned to a single
 replica about six minutes after the load stopped.
 
-![kubectl and nvidia-smi during the load test: five Triton pods Running, GPU 47% busy with five tritonserver processes on GPU 0, HPA showing 47/30 and 5 replicas.](docs/images/result.jpg?raw=true)
+![kubectl and nvidia-smi during the load test: five Triton pods Running, GPU 47% busy with five tritonserver processes on GPU 0, HPA showing 47/30 and 5 replicas.](docs/images/hpa-scale-out.jpg?raw=true)
 
 ---
 
