@@ -79,7 +79,6 @@ pid, process_name, used_gpu_memory [MiB]
 - [Repository layout](#repository-layout)
 - [Troubleshooting](#troubleshooting)
 - [Why not the GPU Operator?](#why-not-the-gpu-operator)
-- [Acknowledgements](#acknowledgements)
 - [References](#references)
 
 ---
@@ -647,16 +646,6 @@ chart does without RuntimeClass. If you are on a real cluster with containerd,
 the GPU Operator remains the right choice.
 
 ---
-
-## Acknowledgements
-
-I would like to thank my teammates for their valuable support during this work.
-
-- **Ahmet Selim Demirel**
-- **Doğan Mehmet Başoğlu**
-- **Elif Cansu Ada**
-- **Mevlüt Ardıç**
-- **Serhat Karaca**
 
 ## References
 
