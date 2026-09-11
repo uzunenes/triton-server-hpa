@@ -15,7 +15,7 @@
             <mxPoint x="330" y="420" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="WIxUvjPda7Iq976gCaOr-54" value="&lt;div&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;k8s - service&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;load blancer&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=13;labelBackgroundColor=default;strokeWidth=2;strokeColor=light-dark(#000000,#000000);textShadow=0;labelBorderColor=none;shadow=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+        <mxCell id="WIxUvjPda7Iq976gCaOr-54" value="&lt;div&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;k8s - service&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;load balancer&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=13;labelBackgroundColor=default;strokeWidth=2;strokeColor=light-dark(#000000,#000000);textShadow=0;labelBorderColor=none;shadow=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="170" y="400" width="110" height="40" as="geometry" />
         </mxCell>
         <mxCell id="WIxUvjPda7Iq976gCaOr-90" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=Helvetica;fontSize=13;labelBackgroundColor=default;strokeWidth=2;strokeColor=light-dark(#000000,#000000);textShadow=0;labelBorderColor=none;shadow=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="WIxUvjPda7Iq976gCaOr-56" target="WIxUvjPda7Iq976gCaOr-85" edge="1">
@@ -84,7 +84,7 @@
         <mxCell id="WIxUvjPda7Iq976gCaOr-74" value="prometheus" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=13;labelBackgroundColor=default;strokeWidth=2;strokeColor=light-dark(#000000,#000000);textShadow=0;labelBorderColor=none;shadow=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="580" y="450" width="94" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="WIxUvjPda7Iq976gCaOr-75" value="DGCM exporter" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=13;labelBackgroundColor=default;strokeWidth=2;strokeColor=light-dark(#000000,#000000);textShadow=0;labelBorderColor=none;shadow=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+        <mxCell id="WIxUvjPda7Iq976gCaOr-75" value="DCGM exporter" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=13;labelBackgroundColor=default;strokeWidth=2;strokeColor=light-dark(#000000,#000000);textShadow=0;labelBorderColor=none;shadow=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="564.5" y="520" width="125" height="30" as="geometry" />
         </mxCell>
         <mxCell id="WIxUvjPda7Iq976gCaOr-108" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fontFamily=Helvetica;fontSize=13;labelBackgroundColor=default;strokeWidth=2;strokeColor=light-dark(#000000,#000000);textShadow=0;labelBorderColor=none;shadow=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="WIxUvjPda7Iq976gCaOr-82" target="WIxUvjPda7Iq976gCaOr-54" edge="1">

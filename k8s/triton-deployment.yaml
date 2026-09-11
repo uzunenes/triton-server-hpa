@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: triton-inference-server
+  labels:
+    app: triton-inference-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: triton-inference-server
+  template:
+    metadata:
+      labels:
+        app: triton-inference-server
+    spec:
+      containers:
+        - name: triton-inference-server
+          image: nvcr.io/nvidia/tritonserver:25.06-py3
+          args:
+            - tritonserver
+            - --model-repository=/mnt/triton_models
+            - --log-verbose=0
+          ports:
+            - name: http
+              containerPort: 8000
+            - name: grpc
+              containerPort: 8001
+            - name: metrics
+              containerPort: 8002
+          # One time-sliced GPU slot. With replicas: 10 in the device-plugin
+          # config, up to 10 pods share the physical GPU.
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          startupProbe:
+            httpGet:
+              path: /v2/health/ready
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /v2/health/ready
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /v2/health/live
+              port: http
+            periodSeconds: 10
+          volumeMounts:
+            - name: model-repository
+              mountPath: /mnt/triton_models
+              readOnly: true
+      volumes:
+        - name: model-repository
+          hostPath:
+            path: /mnt/triton_models
+            type: Directory

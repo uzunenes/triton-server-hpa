@@ -1,0 +1,20 @@
+# Model artefacts - rebuilt by the steps in the README, too big to commit
+*.pt
+*.onnx
+*.engine
+*.plan
+timing.cache
+
+# Client output
+detection_result*.jpg
+!docs/images/detection_result*.jpg
+
+# Local helm/kube scratch
+/tmp-values/
+kubeconfig
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/

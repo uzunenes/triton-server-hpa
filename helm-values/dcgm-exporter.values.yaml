@@ -1,0 +1,18 @@
+# DCGM exporter publishes DCGM_FI_DEV_GPU_UTIL and friends on :9400.
+#
+# serviceMonitor.enabled is what actually wires the metric through to the HPA:
+# a ServiceMonitor makes Prometheus attach namespace/service/pod labels, and
+# prometheus-adapter needs those labels to answer an Object metric query for
+# `services/dcgm-exporter`. A hand-written scrape_config does not add them.
+serviceMonitor:
+  enabled: true
+  # scrapeTimeout must be <= interval or prometheus-operator silently drops
+  # this ServiceMonitor and DCGM_FI_DEV_GPU_UTIL never reaches Prometheus.
+  # The chart defaults to scrapeTimeout: 25s, so overriding interval alone breaks it.
+  interval: 10s
+  scrapeTimeout: 10s
+
+# The minikube node has no Node Feature Discovery labels, so relax the default
+# affinity and rely on the label we set by hand (see the README).
+nodeSelector:
+  nvidia.com/gpu.present: "true"
